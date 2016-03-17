@@ -8,11 +8,12 @@ apps=("$@")
 
 function find_config_value {
   value="$(heroku config -a $1 | grep $2 | sed "s/$2:[[:blank:]]*//")"
-  if [[ "$value" != "" ]]; then
-    printf "\033[1;32m✔\033[0m ${bold}$1${normal}: $value\n"
-  else
-    printf "\033[1;31m✘\033[0m ${bold}$1${normal}: Not found\n"
+  indicator="\033[1;32m✔\033[0m"
+  if [[ "$value" = "" ]]; then
+    indicator="\033[1;31m✘\033[0m"
+    value="Not found"
   fi
+  printf "$indicator ${bold}$1${normal}: $value\n"
 }
 
 if [ ! "$config_variable" ];then
