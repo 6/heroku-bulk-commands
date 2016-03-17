@@ -16,13 +16,18 @@ function find_config_value {
   printf "$indicator ${bold}$1${normal}: $value\n"
 }
 
-if [ ! "$config_variable" ];then
-  echo "Must specify a config variable."
+function print_error_and_exit {
+  echo $1
+  echo "\nUsage:"
+  echo "heroku-config-query CONFIG_VAR my-app-1 my-app-2"
   exit 1
+}
+
+if [ ! "$config_variable" ];then
+  print_error_and_exit "Must specify a config variable."
 fi
 if [ ${#apps[@]} -eq 0 ]; then
-  echo "Must specify at least one app."
-  exit 1
+  print_error_and_exit "Must specify at least one app."
 fi
 
 echo "\nChecking heroku authentication status..."
