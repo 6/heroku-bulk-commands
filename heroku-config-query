@@ -6,6 +6,10 @@ config_variable=$1
 shift
 apps=("$@")
 
+function set_apps {
+  apps="$(heroku apps -A | sed '/^\s*$/d' | sed '/^=/d' | sed 's/ .*//')"
+}
+
 function find_config_value {
   value="$(heroku config -a $1 | grep "^$2:" | sed "s/$2:[[:blank:]]*//")"
   indicator="\033[1;32m✔\033[0m"
@@ -27,7 +31,7 @@ if [ ! "$config_variable" ];then
   print_error_and_exit "Must specify a config variable."
 fi
 if [ ${#apps[@]} -eq 0 ]; then
-  print_error_and_exit "Must specify at least one app."
+  set_apps
 fi
 
 echo "\nChecking heroku authentication status..."
@@ -35,6 +39,6 @@ heroku auth:whoami
 
 echo "\nSearching for ${bold}$config_variable${normal}..."
 
-for app in "${apps[@]}"; do
+for app in ${apps[@]}; do
   find_config_value $app $config_variable
 done
