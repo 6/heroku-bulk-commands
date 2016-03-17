@@ -1,0 +1,32 @@
+#!/bin/sh
+
+function find_config_value {
+  value="$(heroku config -a $1 | grep $2 | sed "s/$2:[[:blank:]]*//")"
+  if [[ "$value" != "" ]]; then
+    echo "- Found on $1: $value"
+  else
+    echo "- Not found on $1"
+  fi
+}
+
+config_variable=$1
+shift
+apps=("$@")
+
+if [ ! "$config_variable" ];then
+  echo "Must specify a config variable."
+  exit 1
+fi
+if [ ${#apps[@]} -eq 0 ]; then
+  echo "Must specify at least one app."
+  exit 1
+fi
+
+echo "\nChecking heroku authentication status..."
+heroku auth:whoami
+
+echo "\nSearching for $config_variable in $apps..."
+
+for app in "${apps[@]}"; do
+  find_config_value $app $config_variable
+done
